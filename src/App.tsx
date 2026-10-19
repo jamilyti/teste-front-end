@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { Product } from "./assets/types/Product";
 import { getProducts } from "./assets/services/productService";
 import ProductList from "./assets/components/ProductList/ProductList";
@@ -9,16 +9,62 @@ import "./assets/styles/global.css";
 function App() {
   const [selectedProduct, setSelectedProduct] =
     useState<Product | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
 
-    const [searchTerm, setSearchTerm] = useState("");
+  useEffect(() => {
+    let active = true;
 
-  const products = getProducts();
+    getProducts()
+      .then((data) => {
+        if (active) {
+          setProducts(data);
+          setError("");
+        }
+      })
+      .catch(() => {
+        if (active) {
+          setError("Não foi possível carregar os produtos.");
+        }
+      })
+      .finally(() => {
+        if (active) {
+          setLoading(false);
+        }
+      });
+
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const filteredProducts = products.filter((product) =>
-  `${product.productName} ${product.descriptionShort}`
-    .toLowerCase()
-    .includes(searchTerm.trim().toLowerCase())
-);
+    `${product.productName} ${product.descriptionShort}`
+      .toLowerCase()
+      .includes(searchTerm.trim().toLowerCase())
+  );
+
+  const categories = [
+    "Tecnologia",
+    "Supermercado",
+    "Bebidas",
+    "Ferramentas",
+    "Saúde",
+    "Esportes e Fitness",
+    "Moda",
+  ];
+
+  const brands = [
+    "Apple",
+    "Samsung",
+    "Xiaomi",
+    "Motorola",
+    "LG",
+    "Sony",
+  ];
+
   return (
     <main>
       <div className="benefits-bar">
@@ -28,7 +74,11 @@ function App() {
       </div>
 
       <header className="store-header">
-        <a className="store-logo" href="#" aria-label="Econverse - início">
+        <a
+          className="store-logo"
+          href="#"
+          aria-label="Econverse - início"
+        >
           <span>e</span>converse
         </a>
 
@@ -37,20 +87,30 @@ function App() {
           role="search"
           onSubmit={(event) => event.preventDefault()}
         >
-          <label className="visually-hidden" htmlFor="product-search">
+          <label
+            className="visually-hidden"
+            htmlFor="product-search"
+          >
             Buscar produtos
           </label>
+
           <input
-  id="product-search"
-  type="search"
-  placeholder="O que você está buscando?"
-  value={searchTerm}
-  onChange={(event) => setSearchTerm(event.target.value)}
-/>
-          <button type="submit" aria-label="Buscar">⌕</button>
+            id="product-search"
+            type="search"
+            placeholder="O que você está buscando?"
+            value={searchTerm}
+            onChange={(event) => setSearchTerm(event.target.value)}
+          />
+
+          <button type="submit" aria-label="Buscar">
+            ⌕
+          </button>
         </form>
 
-        <nav className="header-actions" aria-label="Ações da loja">
+        <nav
+          className="header-actions"
+          aria-label="Ações da loja"
+        >
           <button type="button" aria-label="Pedidos">♧</button>
           <button type="button" aria-label="Favoritos">♡</button>
           <button type="button" aria-label="Minha conta">◎</button>
@@ -58,7 +118,10 @@ function App() {
         </nav>
       </header>
 
-      <nav className="category-nav" aria-label="Categorias principais">
+      <nav
+        className="category-nav"
+        aria-label="Categorias principais"
+      >
         <a href="#categorias">TODAS CATEGORIAS</a>
         <a href="#produtos">SUPERMERCADO</a>
         <a href="#produtos">LIVROS</a>
@@ -72,28 +135,39 @@ function App() {
         <div className="hero-content">
           <h1>Venha conhecer nossas promoções</h1>
           <p><strong>50% Off</strong> nos produtos</p>
-          <a className="yellow-button" href="#produtos">Ver produto</a>
+          <a className="yellow-button" href="#produtos">
+            Ver produto
+          </a>
         </div>
       </section>
 
-      <section id="categorias" className="category-shortcuts">
-        {[
-          "Tecnologia",
-          "Supermercado",
-          "Bebidas",
-          "Ferramentas",
-          "Saúde",
-          "Esportes e Fitness",
-          "Moda",
-        ].map((category) => (
-          <a href="#produtos" className="category-item" key={category}>
-            <span className="category-icon" aria-hidden="true">
-              {category === "Tecnologia" ? "▣" :
-                category === "Supermercado" ? "♧" :
-                category === "Bebidas" ? "♜" :
-                category === "Ferramentas" ? "⚒" :
-                category === "Saúde" ? "♡" :
-                category === "Esportes e Fitness" ? "♧" : "◇"}
+      <section
+        id="categorias"
+        className="category-shortcuts"
+      >
+        {categories.map((category) => (
+          <a
+            href="#produtos"
+            className="category-item"
+            key={category}
+          >
+            <span
+              className="category-icon"
+              aria-hidden="true"
+            >
+              {category === "Tecnologia"
+                ? "▣"
+                : category === "Supermercado"
+                  ? "♧"
+                  : category === "Bebidas"
+                    ? "♜"
+                    : category === "Ferramentas"
+                      ? "⚒"
+                      : category === "Saúde"
+                        ? "♡"
+                        : category === "Esportes e Fitness"
+                          ? "♧"
+                          : "◇"}
             </span>
             <span>{category}</span>
           </a>
@@ -107,7 +181,10 @@ function App() {
           <span />
         </div>
 
-        <nav className="product-tabs" aria-label="Categorias de produtos">
+        <nav
+          className="product-tabs"
+          aria-label="Categorias de produtos"
+        >
           <a className="active" href="#produtos">CELULAR</a>
           <a href="#produtos">ACESSÓRIOS</a>
           <a href="#produtos">TABLETS</a>
@@ -117,27 +194,44 @@ function App() {
         </nav>
 
         <div className="product-container">
-          <ProductList
-  products={filteredProducts}
-  onProductClick={setSelectedProduct}
-/>
+          {loading ? (
+            <p>Carregando produtos...</p>
+          ) : error ? (
+            <p>{error}</p>
+          ) : filteredProducts.length > 0 ? (
+            <ProductList
+              products={filteredProducts}
+              onProductClick={setSelectedProduct}
+            />
+          ) : (
+            <p>Nenhum produto encontrado.</p>
+          )}
         </div>
       </section>
 
-      <section className="partners-section" aria-label="Parceiros">
+      <section
+        className="partners-section"
+        aria-label="Parceiros"
+      >
         {[1, 2].map((partner) => (
-          <article className="partner-banner" key={partner}>
+          <article
+            className="partner-banner"
+            key={partner}
+          >
             <div className="partner-content">
               <h2>Parceiros</h2>
               <p>Lorem ipsum dolor sit amet, consectetur.</p>
-              <a href="#marcas" className="yellow-button">
+              <a
+                href="#marcas"
+                className="yellow-button"
+              >
                 CONFIRA
               </a>
             </div>
           </article>
         ))}
       </section>
-      
+
       <section id="marcas" className="brands-section">
         <div className="section-title">
           <span />
@@ -146,32 +240,30 @@ function App() {
         </div>
 
         <div className="brands-list">
-          {["Apple", "Samsung", "Xiaomi", "Motorola", "LG", "Sony"].map(
-            (brand) => (
-              <a
-                href="#produtos"
-                className="brand-item"
-                key={brand}
-                aria-label={`Ver produtos da marca ${brand}`}
-              >
-                {brand}
-              </a>
-            ),
-          )}
+          {brands.map((brand) => (
+            <a
+              href="#produtos"
+              className="brand-item"
+              key={brand}
+              aria-label={`Ver produtos da marca ${brand}`}
+            >
+              {brand}
+            </a>
+          ))}
         </div>
       </section>
-
 
       <ProductModal
         product={selectedProduct}
         onClose={() => setSelectedProduct(null)}
       />
 
-      
       <section className="newsletter-section">
         <div className="newsletter-content">
           <h2>Inscreva-se na nossa newsletter</h2>
-          <p>Receba novidades e ofertas especiais diretamente no seu e-mail.</p>
+          <p>
+            Receba novidades e ofertas especiais diretamente no seu e-mail.
+          </p>
         </div>
 
         <form
@@ -181,24 +273,32 @@ function App() {
             alert("Cadastro recebido! Obrigado por se inscrever.");
           }}
         >
-          <label className="visually-hidden" htmlFor="newsletter-email">
+          <label
+            className="visually-hidden"
+            htmlFor="newsletter-email"
+          >
             Seu e-mail
           </label>
+
           <input
             id="newsletter-email"
             type="email"
             placeholder="Digite seu melhor e-mail"
             required
           />
+
           <button type="submit">CADASTRAR</button>
         </form>
       </section>
 
-      
       <footer className="store-footer">
         <div className="footer-content">
           <div className="footer-about">
-            <a className="store-logo" href="#" aria-label="Econverse - início">
+            <a
+              className="store-logo"
+              href="#"
+              aria-label="Econverse - início"
+            >
               <span>e</span>converse
             </a>
             <p>
@@ -223,7 +323,6 @@ function App() {
           <p>© Econverse — Vitrine de produtos</p>
         </div>
       </footer>
-
     </main>
   );
 }
