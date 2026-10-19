@@ -1,8 +1,8 @@
-# Vitrine de Produtos — Teste Front-End Econverse
+# Vitrine de Produtos — Teste Front-End 
 
 ## Sobre o projeto
 
-Projeto de uma vitrine de produtos desenvolvido como parte do teste técnico para a vaga de Front-End Júnior da Econverse.
+Projeto de uma vitrine de produtos desenvolvido como parte do teste técnico 
 
 A aplicação apresenta produtos em cartões, permite pesquisar produtos pelo nome e visualizar seus detalhes em um modal.
 
